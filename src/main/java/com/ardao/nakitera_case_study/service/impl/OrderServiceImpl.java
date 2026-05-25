@@ -40,8 +40,7 @@ public class OrderServiceImpl implements OrderService {
 
         order.setCustomer(customer);
         order.setCreateDate(Instant.now());
-
-        this.orderRepository.save(order);
+        order = this.orderRepository.saveAndFlush(order);
 
         Outbox outboxEvent = createOutboxEvent(customer,order);
 
