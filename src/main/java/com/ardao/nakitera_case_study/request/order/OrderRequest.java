@@ -23,8 +23,10 @@ public record OrderRequest(
         int price
 ) {
     public OrderRequest{
-        assetName = assetName.toUpperCase(Locale.ROOT).trim();
-        orderSide = orderSide.toUpperCase(Locale.ROOT).trim();
+        if(assetName != null && orderSide != null) {
+            assetName = assetName.toUpperCase(Locale.ROOT).trim();
+            orderSide = orderSide.toUpperCase(Locale.ROOT).trim();
+        }
     }
 
 }
