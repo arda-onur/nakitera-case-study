@@ -58,7 +58,7 @@ public class OrderServiceImpl implements OrderService {
 
         if(isAdmin){
             if (customerModel.getId() == null)
-                throw new IllegalArgumentException("customer.id.required.exception");
+                throw new CustomerIdRequiredException("customer.id.required.exception");
             return customerModel.getId();
         }
         User currentUser = (User)authentication.getPrincipal();
