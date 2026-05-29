@@ -1,17 +1,18 @@
 package com.ardao.nakitera_case_study.exception;
 
 
-import com.ardao.nakitera_case_study.exception.custom.CustomerIdRequiredException;
-import com.ardao.nakitera_case_study.exception.custom.CustomerNotFoundException;
-import com.ardao.nakitera_case_study.exception.custom.UserAlreadyExistException;
-import com.ardao.nakitera_case_study.exception.custom.UserNotFoundException;
+import com.ardao.nakitera_case_study.exception.custom.*;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.Locale;
 
@@ -58,4 +59,44 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
     }
 
+
+    @ExceptionHandler(OrderNotFoundException.class)
+    public ResponseEntity<String> handleOrderNotFoundException(OrderNotFoundException ex, Locale locale){
+        String message = this.messageSource.getMessage(ex.getMessage(),ex.getArgs(),ex.getMessage(),locale);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(message);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<String> handleAccessDeniedException(AccessDeniedException ex, Locale locale) {
+        String message = this.messageSource.getMessage(
+                ex.getMessage(),
+                null,
+                ex.getMessage(),
+                locale
+        );
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(message);
+    }
+
+    @ExceptionHandler(OrderCannotBeCanceledException.class)
+    public ResponseEntity<String> handleOrderCannotBeCanceledException(OrderCannotBeCanceledException ex, Locale locale) {
+        String message = this.messageSource.getMessage(ex.getMessage(), ex.getArgs(), ex.getMessage(), locale);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(message);
+    }
+
+    @ExceptionHandler({HandlerMethodValidationException.class,
+                      MethodArgumentTypeMismatchException.class,
+                      ConstraintViolationException.class,})
+    public ResponseEntity<String> handleHandlerMethodValidationException(Exception ex,
+                                                                           Locale locale) {
+        String key = "request.parameters.invalid.exception";
+        String message = this.messageSource.getMessage(key, null, key, locale);
+        return ResponseEntity.badRequest().body(message);
+    }
+
+    @ExceptionHandler(InvalidOrderSideException.class)
+    public ResponseEntity<String> handleInvalidOrderSideException(InvalidOrderSideException ex, Locale locale) {
+        String message = this.messageSource.getMessage(ex.getMessage(), ex.getArgs(), ex.getMessage(), locale);
+        return ResponseEntity.badRequest().body(message);
+    }
 }
