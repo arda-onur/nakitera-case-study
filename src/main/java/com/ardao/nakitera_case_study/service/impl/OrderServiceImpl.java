@@ -33,8 +33,8 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     @Transactional
-    public void createOrder(Order order, CustomerModel customerModel) {
-        long id = resolveCustomerId(customerModel);
+    public void createOrder(Order order, Long customerId) {
+        long id = this.customerIdResolver.resolveCustomerId(customerId);
         Customer customer = this.customerRepository.findById(id)
                               .orElseThrow(() -> new CustomerNotFoundException("customer.not.found.exception", id));
 
