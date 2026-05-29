@@ -13,7 +13,21 @@ public class KafkaTopicConfig {
 
     @Bean
     public NewTopic orderEventsTopic() {
-        return TopicBuilder.name("ORDER_EVENT")
+        return TopicBuilder.name(ORDER_EVENT)
+                .partitions(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic matchedOrderEventsTopic() {
+        return TopicBuilder.name(MATCHED_ORDER_EVENT)
+                .partitions(1)
+                .build();
+    }
+
+    @Bean
+    public NewTopic assetEventsTopic() {
+        return TopicBuilder.name(ASSET_EVENT)
                 .partitions(1)
                 .build();
     }
