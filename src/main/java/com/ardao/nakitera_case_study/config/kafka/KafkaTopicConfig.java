@@ -7,6 +7,9 @@ import org.springframework.kafka.config.TopicBuilder;
 
 @Configuration
 public class KafkaTopicConfig {
+  private static final String ORDER_EVENT = "ORDER_EVENT";
+  private static final String ASSET_EVENT = "ASSET_EVENT";
+  private static final String MATCHED_ORDER_EVENT = "MATCHED_ORDER_EVENT";
 
     @Bean
     public NewTopic orderEventsTopic() {
