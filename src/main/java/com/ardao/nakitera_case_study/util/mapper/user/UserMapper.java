@@ -1,4 +1,4 @@
-package com.ardao.nakitera_case_study.mapper;
+package com.ardao.nakitera_case_study.util.mapper.user;
 
 import com.ardao.nakitera_case_study.entity.User;
 import com.ardao.nakitera_case_study.request.customer.UserRequest;
