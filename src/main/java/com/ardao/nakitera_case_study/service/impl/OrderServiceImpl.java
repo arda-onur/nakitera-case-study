@@ -5,6 +5,7 @@ import com.ardao.nakitera_case_study.entity.box.MatchedOrderOutbox;
 import com.ardao.nakitera_case_study.entity.box.OrderOutbox;
 import com.ardao.nakitera_case_study.enums.Status;
 import com.ardao.nakitera_case_study.exception.custom.CustomerNotFoundException;
+import com.ardao.nakitera_case_study.exception.custom.InvalidOrderAssetException;
 import com.ardao.nakitera_case_study.exception.custom.OrderCannotBeCanceledException;
 import com.ardao.nakitera_case_study.exception.custom.OrderNotFoundException;
 import com.ardao.nakitera_case_study.util.mapper.order.OrderMapper;
@@ -56,6 +57,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public void createOrder(Order order, Long customerId) {
+        validateOrderAsset(order.getAssetName());
         long id = this.customerIdResolver.resolveCustomerId(customerId);
         Customer customer = this.customerRepository.findById(id)
                               .orElseThrow(() -> new CustomerNotFoundException("customer.not.found.exception", id));
@@ -226,6 +228,11 @@ public class OrderServiceImpl implements OrderService {
                 throw new AccessDeniedException("access.denied.exception");
 
             }
+        }
+    }
+    private void validateOrderAsset(String assetName) {
+        if ("TRY".equals(assetName)) {
+            throw new InvalidOrderAssetException("invalid.order.asset.exception", assetName);
         }
     }
 }
