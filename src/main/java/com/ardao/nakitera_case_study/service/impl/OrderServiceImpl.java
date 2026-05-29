@@ -38,6 +38,9 @@ public class OrderServiceImpl implements OrderService {
         Customer customer = this.customerRepository.findById(id)
                               .orElseThrow(() -> new CustomerNotFoundException("customer.not.found.exception", id));
 
+        log.info("Creating order. customerId={}, assetName={}, side={}, size={}, price={}",
+                id, order.getAssetName(), order.getOrderSide(), order.getSize(), order.getPrice());
+
         order.setCustomer(customer);
         order.setCreateDate(Instant.now());
         order = this.orderRepository.saveAndFlush(order);
