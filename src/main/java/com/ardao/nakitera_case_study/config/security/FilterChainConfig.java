@@ -27,7 +27,7 @@ public class FilterChainConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
                         .requestMatchers("/login","/auth/**").permitAll()
-                        .requestMatchers("/customer/create").hasRole("ADMIN")
+                        .requestMatchers("/customer/create","/order/match").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults())
                 .cors(withDefaults())
