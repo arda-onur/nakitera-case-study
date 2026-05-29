@@ -1,7 +1,6 @@
-package com.ardao.nakitera_case_study.entity;
+package com.ardao.nakitera_case_study.entity.box;
 
 import com.ardao.nakitera_case_study.enums.Side;
-import com.ardao.nakitera_case_study.enums.Status;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,12 +12,13 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class Outbox {
+public class OrderOutbox {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
+    @Column(nullable = false)
+    private Long orderId;
     @Column(nullable = false)
     private Long customerId;
 
