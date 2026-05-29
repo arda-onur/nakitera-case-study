@@ -23,6 +23,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         log.info("Login attempt for username = {}", username);
         User user = this.userRepository.findUserByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException("user.not.found.exception", username));
+        log.info("User loaded successfully for authentication. username={}, role={}",
+                user.getUsername(), user.getRole());
         return user;
     }
 }
