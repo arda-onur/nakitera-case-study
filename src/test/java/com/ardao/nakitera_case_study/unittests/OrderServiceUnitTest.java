@@ -3,6 +3,7 @@ package com.ardao.nakitera_case_study.unittests;
 import com.ardao.nakitera_case_study.entity.Customer;
 import com.ardao.nakitera_case_study.entity.Order;
 import com.ardao.nakitera_case_study.entity.User;
+import com.ardao.nakitera_case_study.entity.box.MatchedOrderOutbox;
 import com.ardao.nakitera_case_study.entity.box.OrderOutbox;
 import com.ardao.nakitera_case_study.enums.Side;
 import com.ardao.nakitera_case_study.enums.Status;
@@ -12,6 +13,7 @@ import com.ardao.nakitera_case_study.repository.CustomerRepository;
 import com.ardao.nakitera_case_study.repository.OrderRepository;
 import com.ardao.nakitera_case_study.repository.box.MatchedOrderOutboxRepository;
 import com.ardao.nakitera_case_study.repository.box.OrderOutboxRepository;
+import com.ardao.nakitera_case_study.response.OrderListResponse;
 import com.ardao.nakitera_case_study.service.impl.OrderServiceImpl;
 import com.ardao.nakitera_case_study.util.resolver.CustomerIdResolver;
 import org.junit.jupiter.api.AfterEach;
@@ -21,6 +23,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -29,6 +34,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -252,10 +258,125 @@ public class OrderServiceUnitTest {
         assertEquals(Status.MATCHED, order.getOrderStatus());
 
     }
+     @Test
+    void matchOrders_shouldMatchBuyAndSellOrdersWhenPricesAreCompatible(){
+         Customer buyer = new Customer();
+         buyer.setId(1L);
+
+         Customer seller = new Customer();
+         seller.setId(2L);
+
+         Order buyOrder = new Order();
+         buyOrder.setId(10L);
+         buyOrder.setCustomer(buyer);
+         buyOrder.setAssetName("THY");
+         buyOrder.setOrderSide(Side.BUY);
+         buyOrder.setSize(5);
+         buyOrder.setPrice(120);
+         buyOrder.setOrderStatus(Status.PENDING);
+
+         Order sellOrder = new Order();
+         sellOrder.setId(20L);
+         sellOrder.setCustomer(seller);
+         sellOrder.setAssetName("THY");
+         sellOrder.setOrderSide(Side.SELL);
+         sellOrder.setSize(5);
+         sellOrder.setPrice(100);
+         sellOrder.setOrderStatus(Status.PENDING);
+
+         when(orderRepository.findAllByOrderStatus(Status.PENDING))
+                 .thenReturn(List.of(buyOrder, sellOrder));
 
 
+         orderService.matchOrders();
+
+         assertEquals(Status.MATCHED, buyOrder.getOrderStatus());
+         assertEquals(Status.MATCHED, sellOrder.getOrderStatus());
+
+
+         ArgumentCaptor<MatchedOrderOutbox> outboxCaptor =
+                 ArgumentCaptor.forClass(MatchedOrderOutbox.class);
+
+         verify(matchedOrderOutboxRepository).save(outboxCaptor.capture());
+         MatchedOrderOutbox savedOutbox = outboxCaptor.getValue();
+         assertEquals(buyOrder.getId(), savedOutbox.getBuyOrderId());
+         assertEquals(sellOrder.getId(), savedOutbox.getSellOrderId());
+
+     }
+
+    @Test
+    void matchOrders_shouldNotMatchOrdersWhenBuyPriceIsLowerThanSellPrice() {
+        Customer buyer = new Customer();
+        buyer.setId(1L);
+
+        Customer seller = new Customer();
+        seller.setId(2L);
+
+        Order buyOrder = new Order();
+        buyOrder.setId(10L);
+        buyOrder.setCustomer(buyer);
+        buyOrder.setAssetName("THY");
+        buyOrder.setOrderSide(Side.BUY);
+        buyOrder.setSize(5);
+        buyOrder.setPrice(90);
+        buyOrder.setOrderStatus(Status.PENDING);
+
+        Order sellOrder = new Order();
+        sellOrder.setId(20L);
+        sellOrder.setCustomer(seller);
+        sellOrder.setAssetName("THY");
+        sellOrder.setOrderSide(Side.SELL);
+        sellOrder.setSize(5);
+        sellOrder.setPrice(100);
+        sellOrder.setOrderStatus(Status.PENDING);
+
+        when(orderRepository.findAllByOrderStatus(Status.PENDING)).thenReturn(List.of(sellOrder,buyOrder));
+
+        orderService.matchOrders();
+
+        assertEquals(Status.PENDING,sellOrder.getOrderStatus());
+        assertEquals(Status.PENDING,buyOrder.getOrderStatus());
+
+        verify(matchedOrderOutboxRepository, never()).save(any());
 
     }
+    @Test
+    void getCustomerOrders_shouldReturn() {
+        Order order = new Order();
+        order.setId(10L);
+
+        Customer customer = new Customer();
+        customer.setId(2L);
+        order.setCustomer(customer);
+
+        order.setAssetName("THY");
+        order.setSize(5);
+        order.setPrice(100);
+        order.setOrderSide(Side.BUY);
+        order.setOrderStatus(Status.PENDING);
+        order.setCreateDate(Instant.now());
+
+        Page<Order> orderPage = new PageImpl<>(List.of(order));
+
+        when(customerIdResolver.resolveCustomerId(2L)).thenReturn(2L);
+        when(orderRepository.getOrdersByCustomer_IdAndCreateDateBetween(
+                eq(2L),
+                any(Instant.class),
+                any(Instant.class),
+                any(PageRequest.class)
+        )).thenReturn(orderPage);
+
+        Page<OrderListResponse> result = orderService.getCustomerOrders(0, 10, 2L,
+                                                                null, null);
+
+        assertEquals(1, result.getContent().size());
+        assertEquals("THY", result.getContent().getFirst().assetName());
+        assertEquals(2L, result.getContent().getFirst().customerId());
+    }
+
+
+
+}
     
     
 
