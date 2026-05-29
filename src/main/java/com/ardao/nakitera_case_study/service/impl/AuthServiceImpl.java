@@ -9,11 +9,13 @@ import com.ardao.nakitera_case_study.repository.UserRepository;
 import com.ardao.nakitera_case_study.service.AuthService;
 import com.ardao.nakitera_case_study.service.CustomerService;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class AuthServiceImpl implements AuthService {
     private final UserRepository userRepository;
     private final CustomerService customerService;
@@ -31,10 +33,12 @@ public class AuthServiceImpl implements AuthService {
     @Transactional
     @Override
     public void createUser(User newUser) {
+        log.info("Creating user. username={}", newUser.getUsername());
         Optional<User> isUserInDB = this.userRepository.findUserByUsername(newUser.getUsername());
-        if (isUserInDB.isPresent())
+        if (isUserInDB.isPresent()) {
+            log.warn("User creation rejected because username already exists. username={}", newUser.getUsername());
             throw new UserAlreadyExistException("user.already.exists.exception", newUser.getUsername());
-
+        }
         Customer newCustomer = this.customerService.createCustomer();
                  newCustomer.setUser(newUser);
                  newCustomer.getUser().setPassword(this.passwordEncoder.encode(newUser.getPassword()));
@@ -42,5 +46,7 @@ public class AuthServiceImpl implements AuthService {
                  newCustomer.getUser().setCustomer(newCustomer);
 
         this.customerRepository.save(newCustomer);
+        log.info("User created successfully. username={}, customerId={}",
+                newUser.getUsername(), newCustomer.getId());
     }
 }
