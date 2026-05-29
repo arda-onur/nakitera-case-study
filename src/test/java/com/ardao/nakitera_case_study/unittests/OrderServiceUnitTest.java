@@ -8,6 +8,7 @@ import com.ardao.nakitera_case_study.entity.box.OrderOutbox;
 import com.ardao.nakitera_case_study.enums.Side;
 import com.ardao.nakitera_case_study.enums.Status;
 import com.ardao.nakitera_case_study.exception.custom.CustomerNotFoundException;
+import com.ardao.nakitera_case_study.exception.custom.InvalidOrderAssetException;
 import com.ardao.nakitera_case_study.exception.custom.OrderCannotBeCanceledException;
 import com.ardao.nakitera_case_study.repository.CustomerRepository;
 import com.ardao.nakitera_case_study.repository.OrderRepository;
@@ -29,13 +30,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -118,6 +117,21 @@ public class OrderServiceUnitTest {
 
         assertThrows(CustomerNotFoundException.class, () ->orderService.createOrder(order,1L));
 
+        verify(orderRepository, never()).saveAndFlush(any());
+        verify(orderOutboxRepository, never()).save(any());
+    }
+    @Test
+    void createOrder_shouldThrowWhenAssetNameIsTry() {
+        Order order = new Order();
+        order.setAssetName("TRY");
+        order.setOrderSide(Side.BUY);
+        order.setSize(10);
+        order.setPrice(100);
+
+        assertThrows(InvalidOrderAssetException.class, () -> orderService.createOrder(order, 1L));
+
+        verify(customerIdResolver, never()).resolveCustomerId(any());
+        verify(customerRepository, never()).findById(any());
         verify(orderRepository, never()).saveAndFlush(any());
         verify(orderOutboxRepository, never()).save(any());
     }
