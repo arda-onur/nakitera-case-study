@@ -99,4 +99,9 @@ public class GlobalExceptionHandler {
         String message = this.messageSource.getMessage(ex.getMessage(), ex.getArgs(), ex.getMessage(), locale);
         return ResponseEntity.badRequest().body(message);
     }
+    @ExceptionHandler(InvalidOrderAssetException.class)
+    public ResponseEntity<String> handleInvalidOrderAssetException(InvalidOrderAssetException ex, Locale locale) {
+        String message = this.messageSource.getMessage(ex.getMessage(), ex.getArgs(), ex.getMessage(), locale);
+        return ResponseEntity.badRequest().body(message);
+    }
 }
