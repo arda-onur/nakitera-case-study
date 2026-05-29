@@ -1,16 +1,12 @@
 package com.ardao.nakitera_case_study.controller;
 
 import com.ardao.nakitera_case_study.entity.Customer;
-import com.ardao.nakitera_case_study.repository.CustomerRepository;
 import com.ardao.nakitera_case_study.response.CustomerResponse;
-import com.ardao.nakitera_case_study.response.UserResponse;
 import com.ardao.nakitera_case_study.service.CustomerService;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Locale;
 
