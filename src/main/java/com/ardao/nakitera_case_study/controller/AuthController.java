@@ -1,6 +1,6 @@
 package com.ardao.nakitera_case_study.controller;
 
-import com.ardao.nakitera_case_study.mapper.UserMapper;
+import com.ardao.nakitera_case_study.util.mapper.user.UserMapper;
 import com.ardao.nakitera_case_study.request.customer.UserRequest;
 import com.ardao.nakitera_case_study.response.UserResponse;
 import com.ardao.nakitera_case_study.service.AuthService;
