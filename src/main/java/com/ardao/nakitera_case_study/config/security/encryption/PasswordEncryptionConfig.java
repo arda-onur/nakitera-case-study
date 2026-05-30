@@ -1,4 +1,4 @@
-package com.ardao.nakitera_case_study.config.security;
+package com.ardao.nakitera_case_study.config.security.encryption;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
