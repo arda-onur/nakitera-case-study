@@ -1,4 +1,4 @@
-package com.ardao.nakitera_case_study.config.security;
+package com.ardao.nakitera_case_study.config.security.filter;
 
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
@@ -10,15 +10,18 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 public class FilterChainConfig {
     private final MessageSource messageSource;
+    private final RedisRateLimiterFilter redisRateLimiterFilter;
 
-    public FilterChainConfig(MessageSource messageSource) {
+    public FilterChainConfig(MessageSource messageSource, RedisRateLimiterFilter redisRateLimiterFilter) {
         this.messageSource = messageSource;
+        this.redisRateLimiterFilter = redisRateLimiterFilter;
     }
 
     @Bean
@@ -30,6 +33,7 @@ public class FilterChainConfig {
                         .requestMatchers("/customer/create","/order/match").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults())
+                .addFilterBefore(redisRateLimiterFilter, BasicAuthenticationFilter.class)
                 .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
 
