@@ -35,4 +35,10 @@ public class RedisRateLimiterFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request,response);
     }
+
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String uri = request.getRequestURI();
+        return uri.startsWith("/h2-console") || uri.startsWith("/actuator");
+    }
 }
