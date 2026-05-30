@@ -29,7 +29,11 @@ public class FilterChainConfig {
         return http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PathRequest.toH2Console()).permitAll()
-                        .requestMatchers("/login","/auth/**").permitAll()
+                        .requestMatchers("/login",
+                                "/auth/**",
+                                "/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**").permitAll()
                         .requestMatchers("/customer/create","/order/match").hasRole("ADMIN")
                         .anyRequest().authenticated())
                 .httpBasic(withDefaults())
