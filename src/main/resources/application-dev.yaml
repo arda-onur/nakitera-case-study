@@ -5,6 +5,11 @@ spring:
     username: sa
     password:
 
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
   h2:
     console:
       enabled: true
@@ -26,3 +31,8 @@ spring:
       properties:
         spring.json.use.type.headers: true
         spring.json.trusted.packages: com.ardao.nakitera_case_study.event.dto
+
+app:
+  rate-limit:
+    limit: 3
+    window-second: 10
