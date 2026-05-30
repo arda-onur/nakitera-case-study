@@ -5,6 +5,8 @@ import com.ardao.nakitera_case_study.request.customer.UserRequest;
 import com.ardao.nakitera_case_study.response.UserResponse;
 import com.ardao.nakitera_case_study.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,7 +36,8 @@ public class  AuthController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "User created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request"),
-            @ApiResponse(responseCode = "409", description = "Username already exists")
+            @ApiResponse(responseCode = "409", description = "Username already exists"),
+            @ApiResponse(responseCode = "429", description = "Too many requests")
     })
      @PostMapping("/create")
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest userRequest,  Locale locale){

@@ -44,7 +44,8 @@ public class OrderController {
             @ApiResponse(responseCode = "201", description = "Order created successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid request"),
             @ApiResponse(responseCode = "401", description = "Authentication required"),
-            @ApiResponse(responseCode = "403", description = "Access denied")
+            @ApiResponse(responseCode = "404", description = "Customer not found"),
+            @ApiResponse(responseCode = "429", description = "Too many requests")
     })
     @PostMapping("/create")
     public ResponseEntity<OrderResponse> createOrder(@Valid @RequestBody OrderRequest orderRequest, Locale locale){
@@ -99,7 +100,7 @@ public class OrderController {
             @ApiResponse(responseCode = "200", description = "Orders returned successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
             @ApiResponse(responseCode = "401", description = "Authentication required"),
-            @ApiResponse(responseCode = "403", description = "Access denied")
+            @ApiResponse(responseCode = "429", description = "Too many requests")
     })
     @GetMapping("/list")
     public ResponseEntity<Page<OrderListResponse>> getCustomerList(@Parameter(description = "Page number",

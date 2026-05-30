@@ -33,7 +33,7 @@ public class AssetController {
             @ApiResponse(responseCode = "200", description = "Assets returned successfully"),
             @ApiResponse(responseCode = "400", description = "Invalid query parameters"),
             @ApiResponse(responseCode = "401", description = "Authentication required"),
-            @ApiResponse(responseCode = "403", description = "Access denied")
+            @ApiResponse(responseCode = "429", description = "Too many requests")
     })
     @GetMapping("/list")
     public ResponseEntity<Page<AssetListResponse>> getCustomerList(@Parameter(description = "Page number", example = "0")

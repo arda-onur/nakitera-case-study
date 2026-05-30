@@ -4,6 +4,8 @@ import com.ardao.nakitera_case_study.entity.Customer;
 import com.ardao.nakitera_case_study.response.CustomerResponse;
 import com.ardao.nakitera_case_study.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +32,8 @@ public class CustomerController {
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "Customer created successfully"),
             @ApiResponse(responseCode = "401", description = "Authentication required"),
-            @ApiResponse(responseCode = "403", description = "Admin access required")
+            @ApiResponse(responseCode = "403", description = "Admin access required"),
+            @ApiResponse(responseCode = "429", description = "Too many requests")
     })
      @PostMapping("/create")
     public ResponseEntity<CustomerResponse> createCustomer(Locale locale){
