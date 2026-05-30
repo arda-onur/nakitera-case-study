@@ -138,36 +138,54 @@ public class OrderServiceImpl implements OrderService {
                book.addOrder(order);
           });
 
-          orderBooks.values().forEach(book -> {
-              while (!book.getBuyQueue().isEmpty() && !book.getSellQueue().isEmpty()){
+        orderBooks.values().forEach(book -> {
+            List<Order> skippedSells = new ArrayList<>();
+            while (!book.getBuyQueue().isEmpty() && !book.getSellQueue().isEmpty()) {
 
-                  Order buyOrder = book.getBuyQueue().peek();
-                  Order sellOrder = book.getSellQueue().peek();
+                Order buyOrder = book.getBuyQueue().peek();
+                Order sellOrder = book.getSellQueue().peek();
 
-                  if((buyOrder.getPrice() - sellOrder.getPrice()) < 0){
-                      break;
-                  }
+                if (buyOrder.getCustomer().getId() == sellOrder.getCustomer().getId()) {
+                    skippedSells.add(book.getSellQueue().poll());
+                    continue;
+                }
 
-                  book.getBuyQueue().poll();
-                  book.getSellQueue().poll();
+                if ((buyOrder.getPrice() - sellOrder.getPrice()) < 0) {
+                    if (skippedSells.isEmpty()) {
+                        break;
+                    }
+                    book.getBuyQueue().poll();
+                    skippedSells.forEach(book.getSellQueue()::offer);
+                    skippedSells.clear();
+                    continue;
+                }
 
-                  buyOrder.setOrderStatus(Status.MATCHED);
-                  sellOrder.setOrderStatus(Status.MATCHED);
+                book.getBuyQueue().poll();
+                book.getSellQueue().poll();
 
-                  MatchedOrderOutbox matchedOrderOutbox = new MatchedOrderOutbox();
-                  matchedOrderOutbox.setBuyOrderId(buyOrder.getId());
-                  matchedOrderOutbox.setSellOrderId(sellOrder.getId());
-                  matchedOrderOutbox.setBuyCustomerId(buyOrder.getCustomer().getId());
-                  matchedOrderOutbox.setSellCustomerId(sellOrder.getCustomer().getId());
-                  matchedOrderOutbox.setAssetName(buyOrder.getAssetName());
-                  matchedOrderOutbox.setMatchedSize(buyOrder.getSize());
-                  matchedOrderOutbox.setBuyPrice(buyOrder.getPrice());
-                  matchedOrderOutbox.setSellPrice(sellOrder.getPrice());
+                buyOrder.setOrderStatus(Status.MATCHED);
+                sellOrder.setOrderStatus(Status.MATCHED);
 
-                  this.matchedOrderOutboxRepository.save(matchedOrderOutbox);
-              }
-              log.info("Matching finished.");
-          });
+                skippedSells.forEach(book.getSellQueue()::offer);
+                skippedSells.clear();
+
+                MatchedOrderOutbox matchedOrderOutbox = new MatchedOrderOutbox();
+                matchedOrderOutbox.setBuyOrderId(buyOrder.getId());
+                matchedOrderOutbox.setSellOrderId(sellOrder.getId());
+                matchedOrderOutbox.setBuyCustomerId(buyOrder.getCustomer().getId());
+                matchedOrderOutbox.setSellCustomerId(sellOrder.getCustomer().getId());
+                matchedOrderOutbox.setAssetName(buyOrder.getAssetName());
+                matchedOrderOutbox.setMatchedSize(buyOrder.getSize());
+                matchedOrderOutbox.setBuyPrice(buyOrder.getPrice());
+                matchedOrderOutbox.setSellPrice(sellOrder.getPrice());
+
+                this.matchedOrderOutboxRepository.save(matchedOrderOutbox);
+            }
+
+
+            skippedSells.forEach(book.getSellQueue()::offer);
+        });
+        log.info("Matching finished.");
     }
 
         @Override
