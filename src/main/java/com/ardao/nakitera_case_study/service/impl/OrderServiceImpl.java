@@ -181,8 +181,6 @@ public class OrderServiceImpl implements OrderService {
 
                 this.matchedOrderOutboxRepository.save(matchedOrderOutbox);
             }
-
-
             skippedSells.forEach(book.getSellQueue()::offer);
         });
         log.info("Matching finished.");
