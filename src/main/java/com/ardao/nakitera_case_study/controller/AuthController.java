@@ -4,6 +4,10 @@ import com.ardao.nakitera_case_study.util.mapper.user.UserMapper;
 import com.ardao.nakitera_case_study.request.customer.UserRequest;
 import com.ardao.nakitera_case_study.response.UserResponse;
 import com.ardao.nakitera_case_study.service.AuthService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
@@ -17,6 +21,7 @@ import java.util.Locale;
 
 @RestController
 @RequestMapping("/auth")
+@Tag(name = "Auth", description = "Authentication and user registration endpoints")
 public class  AuthController {
     private final AuthService authService;
     private final MessageSource messageSource;
@@ -25,6 +30,12 @@ public class  AuthController {
         this.authService = authService;
         this.messageSource = messageSource;
     }
+    @Operation(summary = "Create user", description = "Creates a customer user account.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "User created successfully"),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "409", description = "Username already exists")
+    })
      @PostMapping("/create")
     public ResponseEntity<UserResponse> createUser(@Valid @RequestBody UserRequest userRequest,  Locale locale){
          this.authService.createUser(UserMapper.toEntity(userRequest));
