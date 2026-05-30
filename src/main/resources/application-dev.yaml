@@ -34,5 +34,5 @@ spring:
 
 app:
   rate-limit:
-    limit: 3
+    limit: 10
     window-second: 10
