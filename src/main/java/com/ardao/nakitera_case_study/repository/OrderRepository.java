@@ -15,6 +15,7 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order,Long> {
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     Optional<Order> findById(Long id);
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     List<Order> findAllByOrderStatus(Status orderStatus);
     Page<Order> getOrdersByCustomer_IdAndCreateDateBetween(long customerId,
                                                            Instant createDateAfter,
