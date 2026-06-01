@@ -17,7 +17,7 @@ import com.ardao.nakitera_case_study.repository.box.OrderOutboxRepository;
 import com.ardao.nakitera_case_study.response.OrderListResponse;
 import com.ardao.nakitera_case_study.service.OrderService;
 import com.ardao.nakitera_case_study.util.resolver.CustomerIdResolver;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -187,6 +187,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
         @Override
+        @Transactional(readOnly = true)
         public Page<OrderListResponse> getCustomerOrders(int page,
                                                          int size,
                                                          Long customerId,
