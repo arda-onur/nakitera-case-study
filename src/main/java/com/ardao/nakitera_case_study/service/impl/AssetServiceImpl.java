@@ -17,7 +17,7 @@ import com.ardao.nakitera_case_study.response.AssetListResponse;
 import com.ardao.nakitera_case_study.service.AssetService;
 import com.ardao.nakitera_case_study.util.mapper.asset.AssetMapper;
 import com.ardao.nakitera_case_study.util.resolver.CustomerIdResolver;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -264,6 +264,7 @@ public class AssetServiceImpl implements AssetService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<AssetListResponse> getCustomerAssetList(int page, int size, Long customerId) {
         long id = this.customerIdResolver.resolveCustomerId(customerId);
         log.info("Getting asset list of customer  id: {}.",id);
