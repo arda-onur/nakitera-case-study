@@ -8,7 +8,7 @@ import com.ardao.nakitera_case_study.repository.CustomerRepository;
 import com.ardao.nakitera_case_study.repository.UserRepository;
 import com.ardao.nakitera_case_study.service.AuthService;
 import com.ardao.nakitera_case_study.service.CustomerService;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
